@@ -1,21 +1,36 @@
----
-layout: home
----
-
-<section class="hero">
-
-    <div class="hero-inner container">
-
-        <img src="{{ site.author.thumb | prepend: site.baseurl }}" alt="author thumb" class="square">
-        <h1>Hello, I'm Shane!</h1>
-        <h3>{{ site.author.bio }}</h3>
-
-        <a href="files/Resume.pdf" class="btn btn-ghost">Resume</a>
-
-
-        {% include social.html %}
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+        .logo {
+            width: 200px; /* Adjust the width of your logo */
+            height: auto;
+        }
+        .text {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="files/rollfive.png" alt="Logo">
+        <div class="text">Coming Soon - June 9th, 2024</div>
     </div>
-
-
-</section>
+</body>
+</html>
