@@ -1,42 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<link href="https://fonts.cdnfonts.com/css/nairi" rel="stylesheet">
-                
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coming Soon</title>
+    <title>Roll Five</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
+        #dice-display {
+            width: 150px;
+            height: 150px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            border: 5px solid #333;
+            border-radius: 25px; /* More rounded corners */
             background-color: #f0f0f0;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+            position: relative; /* Needed for absolute positioning of dots */
+            cursor: pointer; /* Indicate it's clickable */
         }
-        .container {
-            text-align: center;
+
+        #dice-display.rolling {
+            animation: rollDice 1.5s ease-in-out; /* Increased duration for smoother feel */
         }
-        .logo {
-            width: 200px; /* Adjust the width of your logo */
-            height: auto;
+
+        @keyframes rollDice {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            }
+            50% {
+                transform: rotateX(540deg) rotateY(720deg) rotateZ(360deg);
+            }
+            100% {
+                transform: rotateX(1080deg) rotateY(1440deg) rotateZ(720deg);
+            }
         }
-        .text {
-            font-size: 24px;
-            margin-top: 20px;
+
+        .dot {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+
+        /* Positioning for dots */
+        .face-1 .dot {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .face-2 .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-2 .dot:nth-child(2) {
+            top: 75%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        .face-3 .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-3 .dot:nth-child(2) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .face-3 .dot:nth-child(3) {
+            top: 75%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        .face-4 .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-4 .dot:nth-child(2) {
+            top: 25%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .face-4 .dot:nth-child(3) {
+            top: 75%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-4 .dot:nth-child(4) {
+            top: 75%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        .face-5 .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-5 .dot:nth-child(2) {
+            top: 25%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .face-5 .dot:nth-child(3) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .face-5 .dot:nth-child(4) {
+            top: 75%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-5 .dot:nth-child(5) {
+            top: 75%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        .face-6 .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-6 .dot:nth-child(2) {
+            top: 25%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .face-6 .dot:nth-child(3) {
+            top: 50%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-6 .dot:nth-child(4) {
+            top: 50%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .face-6 .dot:nth-child(5) {
+            top: 75%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .face-6 .dot:nth-child(6) {
+            top: 75%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        #message {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
             font-family: 'Nairi', sans-serif;
+        }
+
+        .win-message {
+            color: green;
+        }
+
+        .lose-message {
+            color: red;
         }
     </style>
 </head>
+<body class="flex flex-col justify-center items-center min-h-screen bg-gray-100 font-sans">
 
-
-<body>
-    <div class="container">
-        <img class="logo" src="https://github.com/lishane/lishane.github.io/blob/master/files/rollfive.png?raw=true" alt="Logo">
-        <div class="text">Coming Soon - June 9th, 2025</div>
+    <div id="dice-display">
+        <!-- Dots will be added here -->
     </div>
+
+    <div id="message"></div>
+
+    <script>
+        const diceDisplay = document.getElementById('dice-display');
+        const messageDiv = document.getElementById('message');
+
+        function createDots(value) {
+            diceDisplay.innerHTML = ''; // Clear previous dots
+            diceDisplay.classList.remove('face-1', 'face-2', 'face-3', 'face-4', 'face-5', 'face-6');
+            diceDisplay.classList.add(`face-${value}`);
+
+            for (let i = 0; i < value; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                diceDisplay.appendChild(dot);
+            }
+        }
+
+        function rollDice() {
+            diceDisplay.classList.add('rolling');
+            messageDiv.textContent = ''; // Clear previous message
+            messageDiv.classList.remove('win-message', 'lose-message');
+
+            // Simulate rolling
+            setTimeout(() => {
+                const diceValue = Math.floor(Math.random() * 6) + 1;
+                createDots(diceValue);
+                diceDisplay.classList.remove('rolling');
+
+                if (diceValue === 5) {
+                    messageDiv.textContent = 'Drink!';
+                    messageDiv.classList.add('lose-message');
+                }
+            }, 1500); // Match animation duration (1.5s)
+        }
+
+        // Add click event listener to the dice
+        diceDisplay.addEventListener('click', rollDice);
+
+        // Initial display with a default face (e.g., 5)
+        createDots(5);
+    </script>
+
 </body>
 </html>
