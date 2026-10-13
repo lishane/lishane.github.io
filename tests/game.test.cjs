@@ -21,44 +21,28 @@ function setup(reduced) {
   const window = { matchMedia: () => ({matches:reduced}), crypto: {getRandomValues: array => { assert(samples.length, 'test must provide RNG sample'); array[0] = samples.shift(); return array; }}, setTimeout: (fn,delay) => {timers.set(++timer,{fn,delay});return timer;}, setInterval: () => ++timer };
   const clear = id => timers.delete(id);
   vm.runInNewContext(source, {document,window,clearTimeout:clear,clearInterval:clear,Uint32Array,Math});
-  return {node:id=>nodes.get(id), events, sample: (...values) => samples.push(...values), finish: () => {const [id,task] = [...timers].find(([,task])=>task.delay === (reduced?180:900));timers.delete(id);task.fn();}, timers};
+  return {node:id=>nodes.get(id), events, sample: (...values) => samples.push(...values), finish: () => {const [id,task] = [...timers].find(([,task])=>task.delay === (reduced?100:800));timers.delete(id);task.fn();}, timers};
 }
 for (const reduced of [false,true]) {
   const game = setup(reduced); const n = game.node;
   assert.equal(n('dice-display').face.children.length,5);
   for (let value = 1; value <= 6; value++) {
     game.sample(value-1);
-    n('roll-button').events.click();
+    n('dice-display').events.click();
     assert(n('dice-display').disabled);
-    assert(n('roll-button').disabled);
-    assert(n('reset-button').disabled);
-    n('dice-display').events.click(); // must not schedule another roll
-    n('reset-button').events.click(); // must not reset mid-roll
+    assert.equal(n('message').textContent,'');
+    n('dice-display').events.click(); // repeated taps must not queue another result
     assert.equal(game.timers.size,1);
     game.finish();
     assert.equal(n('dice-display').face.children.length,value);
-    assert.equal(n('roll-count').textContent,String(value).padStart(2,'0'));
-    assert.equal(n('five-count').textContent,value>=5?'01':'00');
-    assert.equal(n('message').textContent,value===5?'Drink!':"You're in the clear.");
-    assert(!n('roll-button').disabled);
+    assert.equal(n('message').textContent,value===5?'Drink!':'Tap to roll');
+    assert.equal(n('message').classes.has('is-five'),value===5);
+    assert.equal(n('announcement').textContent,`You rolled a ${value}.${value === 5 ? ' Drink!' : ''}`);
+    assert(!n('dice-display').disabled);
   }
   game.sample(4294967295,0); // discarded sample at RNG boundary
-  let prevented = false;
-  game.events.keydown({code:'Space',target:new Element(),preventDefault(){prevented=true;}});
-  assert(prevented);
+  n('dice-display').events.click();
   game.finish();
-  assert.equal(n('roll-count').textContent,'07');
-  assert.equal(n('roll-history').children.length,6);
-  assert.equal(n('roll-history').children[0].textContent,1);
-  n('rules-trigger').events.click();
-  n('roll-button').events.click(); // modal blocks game
-  assert.equal(n('roll-count').textContent,'07');
-  n('rules-done').events.click();
-  assert(!n('rules-dialog').open);
-  n('reset-button').events.click();
-  assert.equal(n('roll-count').textContent,'00');
-  assert.equal(n('five-count').textContent,'00');
-  assert.equal(n('dice-display').face.children.length,5);
-  assert.equal(n('roll-history').children[0].textContent,'Your story starts with a roll.');
+  assert.equal(n('dice-display').face.children.length,1);
 }
-console.log('PASS: all six results, duplicate-roll lock, session counts/history/reset, Space control, modal blocking, reduced motion, RNG boundary.');
+console.log('PASS: all six results, repeat-tap lock, screen-reader announcements, reduced motion, RNG boundary.');
