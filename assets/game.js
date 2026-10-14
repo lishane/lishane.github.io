@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const die = document.getElementById('dice-display');
-  const face = die.querySelector('.die-face');
+  const cube = document.getElementById('dice-cube');
   const message = document.getElementById('message');
   const stage = document.getElementById('dice-stage');
   const result = document.getElementById('result');
@@ -15,8 +15,14 @@
   let isRolling = false;
   let fiveStreak = 0;
 
-  function showFace(value) {
-    face.replaceChildren();
+  // Opposite faces total seven. Rotate the fixed cube instead of changing its pips.
+  const sides = {front:5, back:2, right:3, left:4, top:1, bottom:6};
+  const alignments = {1:'rotateX(-90deg)', 2:'rotateY(180deg)', 3:'rotateY(-90deg)', 4:'rotateY(90deg)', 5:'', 6:'rotateX(90deg)'};
+  const poseFor = value => `rotateX(-24deg) rotateY(-30deg) rotateZ(4deg) ${alignments[value]}`.trim();
+  let currentPose = poseFor(5);
+  for (const [side,value] of Object.entries(sides)) {
+    const face = document.createElement('span');
+    face.className = `cube-face ${side}`;
     for (const position of positions[value]) {
       const pip = document.createElement('span');
       pip.className = 'pip';
@@ -24,6 +30,12 @@
       pip.style.gridColumn = ((position - 1) % 3) + 1;
       face.append(pip);
     }
+    cube.append(face);
+  }
+  function showValue(value) {
+    currentPose = poseFor(value);
+    cube.style.setProperty('--pose', currentPose);
+    cube.setAttribute('data-value', String(value));
     die.setAttribute('aria-label', `Roll the die. Currently showing ${value}.`);
   }
 
@@ -42,24 +54,17 @@
     die.setAttribute('aria-label', 'Rolling the die');
     stage.classList.remove('drink', 'everyone');
     result.classList.remove('drink', 'everyone');
+    const value = randomFace();
+    cube.style.setProperty('--from', currentPose);
+    cube.style.setProperty('--pose', poseFor(value));
     stage.classList.add('rolling');
     die.classList.add('rolling');
     message.classList.remove('is-five', 'is-out');
     message.textContent = '';
     instruction.textContent = '';
     announcement.textContent = 'Rolling';
-    const value = randomFace();
-    let preview;
-    if (!reducedMotion.matches) {
-      let frame = 0;
-      preview = window.setInterval(() => {
-        showFace((frame++ % 6) + 1);
-        die.setAttribute('aria-label', 'Rolling the die');
-      }, 80);
-    }
     window.setTimeout(() => {
-      clearInterval(preview);
-      showFace(value);
+      showValue(value);
       die.classList.remove('rolling');
       stage.classList.remove('rolling');
       const wasInFive = fiveStreak > 0;
@@ -92,5 +97,5 @@
 
   // A native button also supports Enter and Space without extra visible controls.
   die.addEventListener('click', rollDice);
-  showFace(5);
+  showValue(5);
 })();
