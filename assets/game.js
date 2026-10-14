@@ -3,6 +3,9 @@
   const die = document.getElementById('dice-display');
   const face = die.querySelector('.die-face');
   const message = document.getElementById('message');
+  const stage = document.getElementById('dice-stage');
+  const result = document.getElementById('result');
+  const instruction = document.getElementById('instruction');
   const announcement = document.getElementById('announcement');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const positions = {
@@ -10,6 +13,7 @@
     4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9]
   };
   let isRolling = false;
+  let fiveStreak = 0;
 
   function showFace(value) {
     face.replaceChildren();
@@ -36,9 +40,13 @@
     isRolling = true;
     die.disabled = true;
     die.setAttribute('aria-label', 'Rolling the die');
+    stage.classList.remove('drink', 'everyone');
+    result.classList.remove('drink', 'everyone');
+    stage.classList.add('rolling');
     die.classList.add('rolling');
-    message.classList.remove('is-five');
+    message.classList.remove('is-five', 'is-out');
     message.textContent = '';
+    instruction.textContent = '';
     announcement.textContent = 'Rolling';
     const value = randomFace();
     let preview;
@@ -53,12 +61,33 @@
       clearInterval(preview);
       showFace(value);
       die.classList.remove('rolling');
-      message.textContent = value === 5 ? 'Drink!' : 'Tap to roll';
-      if (value === 5) message.classList.add('is-five');
-      announcement.textContent = `You rolled a ${value}.${value === 5 ? ' Drink!' : ''}`;
+      stage.classList.remove('rolling');
+      const wasInFive = fiveStreak > 0;
+      fiveStreak = value === 5 ? fiveStreak + 1 : 0;
+      if (value === 5) {
+        const everyoneDrinks = fiveStreak === 3;
+        message.textContent = everyoneDrinks ? 'Everyone drinks!' : 'Drink!';
+        message.classList.add('is-five');
+        instruction.textContent = fiveStreak === 1
+          ? 'Roll out of the five'
+          : `${fiveStreak} fives in a row. Roll out of the five.`;
+        stage.classList.add('drink');
+        result.classList.add('drink');
+        if (everyoneDrinks) {
+          stage.classList.add('everyone');
+          result.classList.add('everyone');
+        }
+      } else if (wasInFive) {
+        message.textContent = "You're out!";
+        message.classList.add('is-out');
+        instruction.textContent = 'Pass the die';
+      } else {
+        message.textContent = 'Tap to roll';
+      }
+      announcement.textContent = `You rolled a ${value}. ${message.textContent} ${instruction.textContent}`.trim();
       isRolling = false;
       die.disabled = false;
-    }, reducedMotion.matches ? 100 : 800);
+    }, reducedMotion.matches ? 100 : 1200);
   }
 
   // A native button also supports Enter and Space without extra visible controls.
