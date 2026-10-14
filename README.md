@@ -4,6 +4,8 @@ Tap the die. Roll a five? Drink, then keep rolling until you roll out of the fiv
 
 Three consecutive fives trigger **Everyone drinks!** on the third five. Further fives keep the player rolling; a non-five ends the streak and passes the die. A new streak can trigger the group rule again.
 
+A sculpted cube with six fixed faces, a toss-and-land animation, and the supplied Roll Five logo.
+
 A single-screen static game with local CSS and JavaScript. No build step or runtime dependencies. The die is a native button that also supports Enter and Space, with screen-reader roll announcements and reduced-motion support.
 
 ## Preview
