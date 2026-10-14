@@ -12,10 +12,15 @@
   </head>
   <body>
     <main aria-label="Roll Five">
-      <button id="dice-display" class="die" type="button" aria-label="Roll the die. Currently showing 5.">
-        <span class="die-face" aria-hidden="true"></span>
-      </button>
-      <p id="message">Tap to roll</p>
+      <div id="dice-stage" class="dice-stage">
+        <button id="dice-display" class="die" type="button" aria-label="Roll the die. Currently showing 5.">
+          <span class="die-face" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div id="result" class="result">
+        <p id="message">Tap to roll</p>
+        <p id="instruction"></p>
+      </div>
       <span id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></span>
     </main>
   </body>

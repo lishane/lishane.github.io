@@ -16,6 +16,26 @@ main {
   justify-content: center;
   padding: 32px;
 }
+.dice-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 200px;
+  height: 180px;
+  perspective: 800px;
+  isolation: isolate;
+}
+.dice-stage::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  bottom: 0;
+  width: 142px;
+  height: 20px;
+  border-radius: 50%;
+  background: #32332f18;
+  filter: blur(9px);
+}
 .die {
   width: 160px;
   height: 160px;
@@ -54,15 +74,37 @@ main {
   }
 }
 .die:active:not(:disabled) { transform: translateY(2px); }
+.result {
+  height: 82px;
+  width: 100%;
+  margin-top: 18px;
+  text-align: center;
+}
 #message {
   height: 36px;
-  margin: 26px 0 0;
+  margin: 0;
   color: #717580;
   font-size: 14px;
   line-height: 36px;
   text-align: center;
 }
-#message.is-five { color: #24262d; font-size: 26px; font-weight: 600; }
+#message.is-five { color: #a34c20; font-size: 26px; font-weight: 600; }
+#message.is-out { color: #24262d; font-size: 22px; font-weight: 600; }
+#instruction { margin: 6px 0 0; min-height: 20px; color: #717580; font-size: 12px; line-height: 20px; }
+.result.drink #message { animation: drink-pop .65s ease-out both; }
+.result.everyone #message { color: #9b381f; animation: everyone-pop .8s ease-out both; }
+.dice-stage.drink::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 194px;
+  height: 194px;
+  border: 2px solid #c478444d;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: drink-ring 1.15s ease-out 2 forwards;
+}
+.dice-stage.everyone::after { border-color: #b3453d77; animation: drink-ring .9s ease-out 3 forwards; }
 .sr-only {
   position: absolute;
   width: 1px;
@@ -74,15 +116,49 @@ main {
   white-space: nowrap;
   border: 0;
 }
-.die.rolling { animation: tumble .8s cubic-bezier(.45, 0, .25, 1) both; }
-@keyframes tumble {
-  0% { transform: rotate(0); }
-  25% { transform: rotate(55deg) translateY(-12px) scale(.96); }
-  55% { transform: rotate(220deg) translateY(-20px); }
-  80% { transform: rotate(340deg) translateY(-4px); }
-  100% { transform: rotate(360deg); }
+.die.rolling { animation: toss 1.2s linear both; }
+.dice-stage.rolling::before { animation: toss-shadow 1.2s linear both; }
+@keyframes toss {
+  0% { transform: translateY(0) rotate(0); animation-timing-function: cubic-bezier(.2,.65,.35,1); }
+  38% { transform: translateY(-145px) rotateX(155deg) rotateY(50deg) rotateZ(80deg) scale(1.05); animation-timing-function: cubic-bezier(.6,0,.85,.45); }
+  65% { transform: translateY(5px) rotateX(360deg) rotateY(0) rotateZ(170deg) scale(1.1,.87); animation-timing-function: ease-out; }
+  77% { transform: translateY(-25px) rotateX(360deg) rotateZ(260deg) scale(.98,1.02); animation-timing-function: ease-in; }
+  88% { transform: translateY(2px) rotateX(360deg) rotateZ(345deg) scale(1.04,.96); animation-timing-function: ease-out; }
+  95% { transform: translateY(-4px) rotateX(360deg) rotateZ(363deg); }
+  100% { transform: translateY(0) rotateX(360deg) rotateZ(360deg); }
+}
+@keyframes toss-shadow {
+  0%, 65%, 88%, 100% { transform: scale(1); opacity: 1; }
+  38% { transform: scale(.45); opacity: .2; }
+  77% { transform: scale(.8); opacity: .65; }
+}
+@keyframes drink-pop {
+  0% { opacity: 0; transform: translateY(10px) scale(.7); }
+  55% { opacity: 1; transform: translateY(-3px) scale(1.15); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes everyone-pop {
+  0% { opacity: 0; transform: scale(.65) rotate(-4deg); }
+  35% { opacity: 1; transform: scale(1.12) rotate(3deg); }
+  60% { transform: scale(.98) rotate(-2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes drink-ring {
+  0% { transform: scale(.75); opacity: .8; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+@media (max-height: 520px) {
+  @keyframes toss {
+    0% { transform: translateY(0) rotate(0); }
+    38% { transform: translateY(-65px) rotateX(155deg) rotateZ(80deg); }
+    65% { transform: translateY(4px) rotateX(360deg) rotateZ(170deg) scale(1.08,.9); }
+    77% { transform: translateY(-16px) rotateX(360deg) rotateZ(260deg); }
+    90% { transform: translateY(2px) rotateX(360deg) rotateZ(345deg); }
+    100% { transform: translateY(0) rotateX(360deg) rotateZ(360deg); }
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .die { animation: none !important; transition: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .dice-stage.drink::after { display: none; }
   .die:hover:not(:disabled), .die:active:not(:disabled) { transform: none; }
 }
