@@ -1,8 +1,8 @@
 :root {
-  color-scheme: dark;
-  font-family: Arial, sans-serif;
-  background: #181916;
-  color: #ff8055;
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f3f4f6;
+  color: #24262d;
   -webkit-font-smoothing: antialiased;
 }
 * { box-sizing: border-box; }
@@ -20,58 +20,43 @@ main {
   width: 160px;
   height: 160px;
   flex-shrink: 0;
-  border: 0;
-  border-radius: 34px;
-  position: relative;
+  border: 1px solid #e4e5e9;
+  border-radius: 28px;
   padding: 0;
-  background: #c84e2b;
+  background: #fff;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transform: rotate(-12deg);
-  box-shadow: 0 10px 0 #b3482c, 0 12px 0 1px #643322, 0 24px 32px #0006;
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.die::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(145deg, #ffac79, #ff8b57 25%, #ff7848 75%, #ef6338);
-  box-shadow: inset 0 1px 2px #ffe6bccc, inset 0 0 0 1px #ffa475;
-  pointer-events: none;
+  box-shadow: 0 3px 0 #e2e3e7, 0 12px 24px #24262d0c;
+  transition: transform .18s ease, box-shadow .18s ease;
 }
 .die-face {
   display: grid;
   grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-  gap: 14px;
+  gap: 15px;
   padding: 29px;
-  position: relative;
   width: 100%;
   height: 100%;
 }
-.pip {
-  border-radius: 50%;
-  background: #302d20;
-  box-shadow: inset 0 2px 3px #000b, 0 1px 0 #ffbc82;
-}
-.die:focus-visible { outline: 3px solid #f0efde; outline-offset: 12px; }
+.pip { border-radius: 50%; background: #24262d; }
+.die:focus-visible { outline: 3px solid #667085; outline-offset: 7px; }
 .die:disabled { cursor: wait; }
 @media (hover: hover) {
   .die:hover:not(:disabled) {
-    transform: rotate(-7deg) translateY(-4px);
-    box-shadow: 0 10px 0 #b3482c, 0 12px 0 1px #643322, 0 28px 36px #0006;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 0 #e2e3e7, 0 16px 28px #24262d12;
   }
 }
+.die:active:not(:disabled) { transform: translateY(2px); }
 #message {
   height: 36px;
-  margin: 42px 0 0;
-  color: #aaa99d;
-  font-size: 13px;
+  margin: 26px 0 0;
+  color: #717580;
+  font-size: 14px;
   line-height: 36px;
   text-align: center;
 }
-#message.is-five { color: #ff8055; font-size: 28px; font-weight: 600; }
+#message.is-five { color: #24262d; font-size: 26px; font-weight: 600; }
 .sr-only {
   position: absolute;
   width: 1px;
@@ -85,13 +70,13 @@ main {
 }
 .die.rolling { animation: tumble .8s cubic-bezier(.45, 0, .25, 1) both; }
 @keyframes tumble {
-  0% { transform: rotate(-12deg); }
-  25% { transform: rotate(45deg) translateY(-25px) scale(.96); }
-  55% { transform: rotate(210deg) translateY(-40px) scale(1.04); }
-  80% { transform: rotate(335deg) translateY(-8px); }
-  100% { transform: rotate(348deg); }
+  0% { transform: rotate(0); }
+  25% { transform: rotate(55deg) translateY(-12px) scale(.96); }
+  55% { transform: rotate(220deg) translateY(-20px); }
+  80% { transform: rotate(340deg) translateY(-4px); }
+  100% { transform: rotate(360deg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .die { animation: none !important; transition: none; }
-  .die:hover:not(:disabled) { transform: rotate(-12deg); }
+  .die:hover:not(:disabled), .die:active:not(:disabled) { transform: none; }
 }
