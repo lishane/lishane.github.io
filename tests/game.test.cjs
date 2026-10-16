@@ -22,7 +22,7 @@ function setup(reduced) {
   const nodes = new Map(); const samples = []; const timers = new Map(); let timer = 0;
   const document = {
     getElementById: id => { if (!nodes.has(id)) nodes.set(id,new Element()); return nodes.get(id); },
-    createElement: () => new Element()
+    createElementNS: () => new Element()
   };
   const window = {
     matchMedia: () => ({matches:reduced}),
@@ -44,28 +44,12 @@ function setup(reduced) {
     roll(value) { samples.push(value-1); nodes.get('dice-display').events.click(); finish(); }
   };
 }
-// Determine the most camera-facing side from the resulting CSS rotation.
-// This independently verifies the visible face, not only its accessible label.
-function visibleValue(cube) {
-  const rotations = [...cube.style.vars['--pose'].matchAll(/rotate([XYZ])\((-?[\d.]+)deg\)/g)].reverse();
-  const normals = {1:[0,-1,0],2:[0,0,-1],3:[1,0,0],4:[-1,0,0],5:[0,0,1],6:[0,1,0]};
-  return Number(Object.entries(normals).map(([value,normal]) => {
-    let [x,y,z] = normal;
-    for (const [,axis,degrees] of rotations) {
-      const radians = Number(degrees)*Math.PI/180;
-      const c = Math.cos(radians), s = Math.sin(radians);
-      if (axis === 'X') [y,z] = [y*c-z*s,y*s+z*c];
-      if (axis === 'Y') [x,z] = [x*c+z*s,-x*s+z*c];
-      if (axis === 'Z') [x,y] = [x*c-y*s,x*s+y*c];
-    }
-    return [value,z];
-  }).sort((a,b)=>b[1]-a[1])[0][0]);
-}
 for (const reduced of [false,true]) {
   for (let value = 1; value <= 6; value++) {
     const game = setup(reduced); const n = game.node;
-    assert.equal(visibleValue(n('dice-cube')),5);
-    assert.deepEqual(n('dice-cube').children.map(face=>face.children.length),[5,2,3,4,1,6]);
+    assert.equal(n('front-pips').children.length,6);
+    assert.equal(n('top-pips').children.length,2);
+    assert.equal(n('side-pips').children.length,3);
     assert(!n('result').classes.has('drink'), 'initial face is not a rolled five');
     game.samples.push(value-1);
     n('dice-display').events.click();
@@ -74,8 +58,14 @@ for (const reduced of [false,true]) {
     assert.equal(n('message').textContent,'');
     n('dice-display').events.click(); // repeated taps must not queue another result
     game.finish();
-    assert.equal(visibleValue(n('dice-cube')),value);
-    assert.equal(n('dice-cube').attrs['data-value'],String(value));
+    assert.equal(n('front-pips').children.length,value);
+    assert.equal(n('die-art').attrs['data-value'],String(value));
+    const visible = [value,n('top-pips').children.length,n('side-pips').children.length];
+    assert.equal(new Set(visible).size,3);
+    for (let a=0;a<3;a++) for (let b=a+1;b<3;b++) assert.notEqual(visible[a]+visible[b],7,'opposite faces must not be adjacent');
+    for (const layer of ['front-pips','top-pips','side-pips']) {
+      for (const pip of n(layer).children) for (const attr of ['cx','cy','rx','ry']) assert(Number.isFinite(pip.attrs[attr]));
+    }
     assert.equal(n('message').textContent,value===5?'Drink!':'Tap to roll');
     assert.equal(n('instruction').textContent,value===5?'Roll out of the five':'');
     assert.equal(n('message').classes.has('is-five'),value===5);
@@ -116,6 +106,6 @@ for (const reduced of [false,true]) {
   game.samples.push(4294967295,0); // discarded sample at RNG boundary
   n('dice-display').events.click();
   game.finish();
-  assert.equal(visibleValue(n('dice-cube')),1);
+  assert.equal(n('front-pips').children.length,1);
 }
-console.log('PASS: all six visible cube results, fixed face pips, repeat-tap lock, third consecutive five, rolling out/reset, separate streaks, announcements, normal/reduced-motion timing, RNG boundary.');
+console.log('PASS: all six illustrated results, adjacent-face validity, repeat-tap lock, third consecutive five, rolling out/reset, separate streaks, announcements, normal/reduced-motion timing, RNG boundary.');

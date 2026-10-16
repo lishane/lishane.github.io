@@ -33,8 +33,8 @@ main {
   position: relative;
   display: grid;
   place-items: center;
-  width: 200px;
-  height: 200px;
+  width: 240px;
+  height: 230px;
   perspective: 800px;
   isolation: isolate;
 }
@@ -52,8 +52,8 @@ main {
 .die {
   display: grid;
   place-items: center;
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   border: 0;
   border-radius: 20px;
   padding: 0;
@@ -63,39 +63,14 @@ main {
   -webkit-tap-highlight-color: transparent;
   transition: transform .18s ease;
 }
-.cube {
-  position: relative;
-  width: 118px;
-  height: 118px;
-  transform-style: preserve-3d;
-  transform: var(--pose, rotateX(-24deg) rotateY(-30deg) rotateZ(4deg));
-}
-.cube-face {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-  align-items: center;
-  justify-items: center;
-  border: 4px solid #100e0d;
-  border-radius: 16px 20px 15px 18px;
-  padding: 17px;
-  background: #fff;
-  backface-visibility: hidden;
-}
-.front { transform: translateZ(58px); background: #fff; }
-.back { transform: rotateY(180deg) translateZ(58px); }
-.right { transform: rotateY(90deg) translateZ(58px); background: #fff; }
-.left { transform: rotateY(-90deg) translateZ(58px); }
-.top { transform: rotateX(90deg) translateZ(58px); background: #fff; }
-.bottom { transform: rotateX(-90deg) translateZ(58px); }
-.pip {
+.die-art {
   display: block;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #100e0d;
+  width: 220px;
+  height: 220px;
+  overflow: visible;
+  user-select: none;
 }
+.die-art g { fill: #100e0d; }
 .die:focus-visible { outline: 3px solid #667085; outline-offset: 7px; }
 .die:disabled { cursor: wait; }
 @media (hover: hover) {
@@ -148,24 +123,15 @@ main {
   border: 0;
 }
 .die.rolling { animation: toss 1.2s linear both; }
-.die.rolling .cube { animation: cube-spin 1.2s linear both; }
 .dice-stage.rolling::before { animation: toss-shadow 1.2s linear both; }
 @keyframes toss {
-  0% { transform: translateY(0); animation-timing-function: cubic-bezier(.2,.65,.35,1); }
-  38% { transform: translateY(-145px) scale(1.05); animation-timing-function: cubic-bezier(.6,0,.85,.45); }
-  65% { transform: translateY(5px) scale(1.08,.92); animation-timing-function: ease-out; }
-  77% { transform: translateY(-25px) scale(.98,1.02); animation-timing-function: ease-in; }
-  88% { transform: translateY(2px) scale(1.04,.96); animation-timing-function: ease-out; }
-  95% { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
-@keyframes cube-spin {
-  0% { transform: var(--from); }
-  38% { transform: rotateX(160deg) rotateY(240deg) rotateZ(90deg); }
-  65% { transform: var(--pose); }
-  77% { transform: var(--pose) rotateZ(-8deg); }
-  88% { transform: var(--pose) rotateZ(4deg); }
-  100% { transform: var(--pose); }
+  0% { transform: translateY(0) rotate(0); animation-timing-function: cubic-bezier(.2,.65,.35,1); }
+  38% { transform: translateY(calc(-1 * var(--toss-height, 145px))) rotate(-145deg) scale(1.05); animation-timing-function: cubic-bezier(.6,0,.85,.45); }
+  65% { transform: translateY(5px) rotate(-325deg) scale(1.08,.92); animation-timing-function: ease-out; }
+  77% { transform: translateY(-25px) rotate(-350deg) scale(.98,1.02); animation-timing-function: ease-in; }
+  88% { transform: translateY(2px) rotate(-364deg) scale(1.04,.96); animation-timing-function: ease-out; }
+  95% { transform: translateY(-4px) rotate(-358deg); }
+  100% { transform: translateY(0) rotate(-360deg); }
 }
 @keyframes toss-shadow {
   0%, 65%, 88%, 100% { transform: scale(1); opacity: 1; }
@@ -193,14 +159,14 @@ main {
 @media (max-height: 520px) {
   .brand { top: 16px; left: 20px; transform: none; font-size: 15px; }
   .brand img { width: 30px; height: 30px; }
-  @keyframes toss {
-    0% { transform: translateY(0); }
-    38% { transform: translateY(-60px); }
-    65% { transform: translateY(4px) scale(1.08,.92); }
-    77% { transform: translateY(-16px); }
-    90% { transform: translateY(2px); }
-    100% { transform: translateY(0); }
-  }
+  main { padding: 20px; }
+  .dice-stage { height: 180px; --toss-height: 30px; }
+  .die, .die-art { width: 170px; height: 170px; }
+  .result { height: 70px; margin-top: 10px; }
+}
+@media (max-height: 360px) {
+  .dice-stage { height: 160px; --toss-height: 15px; }
+  .die, .die-art { width: 150px; height: 150px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

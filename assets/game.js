@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const die = document.getElementById('dice-display');
-  const cube = document.getElementById('dice-cube');
+  const art = document.getElementById('die-art');
   const message = document.getElementById('message');
   const stage = document.getElementById('dice-stage');
   const result = document.getElementById('result');
@@ -15,28 +15,47 @@
   let isRolling = false;
   let fiveStreak = 0;
 
-  // Opposite faces total seven. Rotate the fixed cube instead of changing its pips.
-  const sides = {front:5, back:2, right:3, left:4, top:1, bottom:6};
-  const alignments = {1:'rotateX(-90deg)', 2:'rotateY(180deg)', 3:'rotateY(-90deg)', 4:'rotateY(90deg)', 5:'', 6:'rotateX(90deg)'};
-  const poseFor = value => `rotateX(-24deg) rotateY(-30deg) rotateZ(4deg) ${alignments[value]}`.trim();
-  let currentPose = poseFor(5);
-  for (const [side,value] of Object.entries(sides)) {
-    const face = document.createElement('span');
-    face.className = `cube-face ${side}`;
+  // Adjacent faces from rotations of the same conventional die (opposites total 7).
+  // The large front face is always the result; the small faces move with it.
+  const adjacentFaces = {1:[2,4], 2:[1,3], 3:[2,1], 4:[2,6], 5:[6,3], 6:[2,3]};
+  const pipLayers = {
+    front: document.getElementById('front-pips'),
+    top: document.getElementById('top-pips'),
+    side: document.getElementById('side-pips')
+  };
+  function drawPips(surface, value) {
+    const layer = pipLayers[surface];
+    layer.replaceChildren();
     for (const position of positions[value]) {
-      const pip = document.createElement('span');
-      pip.className = 'pip';
-      pip.style.gridRow = Math.ceil(position / 3);
-      pip.style.gridColumn = ((position - 1) % 3) + 1;
-      face.append(pip);
+      const u = ((position - 1) % 3) / 2;
+      const v = Math.floor((position - 1) / 3) / 2;
+      let x, y, rx, ry, angle;
+      if (surface === 'front') {
+        x = 586 + 344*u - 41*v; y = 740 + 6*u + 285*v;
+        rx = 59; ry = 56; angle = -8;
+      } else if (surface === 'top') {
+        x = 506 + 439*u - 20*v; y = 274 + 28*u + 180*v;
+        rx = value === 6 ? 49 : 62; ry = value === 6 ? 33 : 58; angle = -10;
+      } else {
+        x = 262 + 92*u - 64*v; y = 430 + 107*u + 390*v;
+        rx = 34; ry = 63; angle = 20;
+      }
+      const pip = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      pip.setAttribute('cx',x);
+      pip.setAttribute('cy',y);
+      pip.setAttribute('rx',rx);
+      pip.setAttribute('ry',ry);
+      pip.setAttribute('transform',`rotate(${angle} ${x} ${y})`);
+      layer.append(pip);
     }
-    cube.append(face);
   }
   function showValue(value) {
-    currentPose = poseFor(value);
-    cube.style.setProperty('--pose', currentPose);
-    cube.setAttribute('data-value', String(value));
-    die.setAttribute('aria-label', `Roll the die. Currently showing ${value}.`);
+    const [top,side] = adjacentFaces[value];
+    drawPips('front',value);
+    drawPips('top',top);
+    drawPips('side',side);
+    art.setAttribute('data-value',String(value));
+    die.setAttribute('aria-label', `Roll the die. Front face showing ${value}.`);
   }
 
   // Rejection sampling gives all six sides equal probability.
@@ -55,15 +74,22 @@
     stage.classList.remove('drink', 'everyone');
     result.classList.remove('drink', 'everyone');
     const value = randomFace();
-    cube.style.setProperty('--from', currentPose);
-    cube.style.setProperty('--pose', poseFor(value));
     stage.classList.add('rolling');
     die.classList.add('rolling');
     message.classList.remove('is-five', 'is-out');
     message.textContent = '';
     instruction.textContent = '';
     announcement.textContent = 'Rolling';
+    let preview;
+    if (!reducedMotion.matches) {
+      let frame = 0;
+      preview = window.setInterval(() => {
+        showValue(frame++ % 6 + 1);
+        die.setAttribute('aria-label','Rolling the die');
+      },90);
+    }
     window.setTimeout(() => {
+      clearInterval(preview);
       showValue(value);
       die.classList.remove('rolling');
       stage.classList.remove('rolling');
@@ -97,5 +123,5 @@
 
   // A native button also supports Enter and Space without extra visible controls.
   die.addEventListener('click', rollDice);
-  showValue(5);
+  showValue(6);
 })();
