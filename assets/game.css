@@ -35,7 +35,7 @@ main {
   place-items: center;
   width: 240px;
   height: 230px;
-  perspective: 800px;
+  --toss-height: clamp(30px, calc(50svh - 250px), 145px);
   isolation: isolate;
 }
 .dice-stage::before {
@@ -70,6 +70,13 @@ main {
   overflow: visible;
   user-select: none;
 }
+.die-outline {
+  fill: #fff;
+  stroke: #100e0d;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .die-art g { fill: #100e0d; }
 .die:focus-visible { outline: 3px solid #667085; outline-offset: 7px; }
 .die:disabled { cursor: wait; }
@@ -81,10 +88,19 @@ main {
 }
 .die:active:not(:disabled) { transform: translateY(2px); }
 .result {
-  height: 82px;
+  height: 110px;
   width: 100%;
   margin-top: 18px;
   text-align: center;
+}
+#roll-result {
+  height: 28px;
+  line-height: 28px;
+  margin: 0 0 4px;
+  color: #24262d;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 #message {
   height: 36px;
@@ -162,7 +178,7 @@ main {
   main { padding: 20px; }
   .dice-stage { height: 180px; --toss-height: 30px; }
   .die, .die-art { width: 170px; height: 170px; }
-  .result { height: 70px; margin-top: 10px; }
+  .result { height: 100px; margin-top: 10px; }
 }
 @media (max-height: 360px) {
   .dice-stage { height: 160px; --toss-height: 15px; }
