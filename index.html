@@ -7,8 +7,8 @@
     <meta name="description" content="Tap the die to roll. Roll a five? Drink!">
     <title>Roll Five</title>
     <link rel="icon" href="assets/logo.png" type="image/png">
-    <link rel="stylesheet" href="assets/game.css?v=20261016-artwork">
-    <script src="assets/game.js?v=20261016-artwork" defer></script>
+    <link rel="stylesheet" href="assets/game.css?v=20261018-single-face">
+    <script src="assets/game.js?v=20261018-single-face" defer></script>
   </head>
   <body>
     <header class="brand" aria-label="Roll Five">
@@ -18,15 +18,14 @@
     <main aria-label="Roll Five">
       <div id="dice-stage" class="dice-stage">
         <button id="dice-display" class="die" type="button" aria-label="Roll the die. Currently showing 6.">
-          <svg id="die-art" class="die-art" viewBox="0 0 1254 1254" aria-hidden="true" focusable="false">
-            <image href="assets/die-body.png" width="1254" height="1254"/>
-            <g id="top-pips"></g>
-            <g id="side-pips"></g>
+          <svg id="die-art" class="die-art" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+            <path class="die-outline" d="M52 22 C90 17 153 19 187 24 C205 27 215 38 217 57 C221 97 221 158 215 187 C212 207 201 216 181 218 C142 222 86 220 53 215 C33 212 23 202 21 183 C17 145 18 88 23 55 C25 36 34 25 52 22 Z"/>
             <g id="front-pips"></g>
           </svg>
         </button>
       </div>
       <div id="result" class="result">
+        <p id="roll-result"></p>
         <p id="message">Tap to roll</p>
         <p id="instruction"></p>
       </div>

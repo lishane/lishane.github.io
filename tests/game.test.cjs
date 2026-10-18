@@ -48,23 +48,24 @@ for (const reduced of [false,true]) {
   for (let value = 1; value <= 6; value++) {
     const game = setup(reduced); const n = game.node;
     assert.equal(n('front-pips').children.length,6);
-    assert.equal(n('top-pips').children.length,2);
-    assert.equal(n('side-pips').children.length,3);
+    assert.equal(n('roll-result').textContent,'');
     assert(!n('result').classes.has('drink'), 'initial face is not a rolled five');
     game.samples.push(value-1);
     n('dice-display').events.click();
     assert(n('dice-display').disabled);
     assert(n('dice-stage').classes.has('rolling'));
     assert.equal(n('message').textContent,'');
+    assert.equal(n('roll-result').textContent,'');
     n('dice-display').events.click(); // repeated taps must not queue another result
     game.finish();
     assert.equal(n('front-pips').children.length,value);
     assert.equal(n('die-art').attrs['data-value'],String(value));
-    const visible = [value,n('top-pips').children.length,n('side-pips').children.length];
-    assert.equal(new Set(visible).size,3);
-    for (let a=0;a<3;a++) for (let b=a+1;b<3;b++) assert.notEqual(visible[a]+visible[b],7,'opposite faces must not be adjacent');
-    for (const layer of ['front-pips','top-pips','side-pips']) {
-      for (const pip of n(layer).children) for (const attr of ['cx','cy','rx','ry']) assert(Number.isFinite(pip.attrs[attr]));
+    assert.equal(n('roll-result').textContent,`Rolled ${value}`);
+    assert.equal(n('dice-display').attrs['aria-label'],`Roll the die. Showing ${value}.`);
+    for (const pip of n('front-pips').children) {
+      for (const attr of ['cx','cy','r']) assert(Number.isFinite(pip.attrs[attr]));
+      assert(pip.attrs.cx >= 66 && pip.attrs.cx <= 174);
+      assert(pip.attrs.cy >= 65 && pip.attrs.cy <= 173);
     }
     assert.equal(n('message').textContent,value===5?'Drink!':'Tap to roll');
     assert.equal(n('instruction').textContent,value===5?'Roll out of the five':'');
@@ -108,4 +109,4 @@ for (const reduced of [false,true]) {
   game.finish();
   assert.equal(n('front-pips').children.length,1);
 }
-console.log('PASS: all six illustrated results, adjacent-face validity, repeat-tap lock, third consecutive five, rolling out/reset, separate streaks, announcements, normal/reduced-motion timing, RNG boundary.');
+console.log('PASS: all six single-face results, matching numeric and accessible results, repeat-tap lock, third consecutive five, rolling out/reset, separate streaks, announcements, normal/reduced-motion timing, RNG boundary.');

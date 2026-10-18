@@ -2,6 +2,7 @@
   'use strict';
   const die = document.getElementById('dice-display');
   const art = document.getElementById('die-art');
+  const rollResult = document.getElementById('roll-result');
   const message = document.getElementById('message');
   const stage = document.getElementById('dice-stage');
   const result = document.getElementById('result');
@@ -15,47 +16,18 @@
   let isRolling = false;
   let fiveStreak = 0;
 
-  // Adjacent faces from rotations of the same conventional die (opposites total 7).
-  // The large front face is always the result; the small faces move with it.
-  const adjacentFaces = {1:[2,4], 2:[1,3], 3:[2,1], 4:[2,6], 5:[6,3], 6:[2,3]};
-  const pipLayers = {
-    front: document.getElementById('front-pips'),
-    top: document.getElementById('top-pips'),
-    side: document.getElementById('side-pips')
-  };
-  function drawPips(surface, value) {
-    const layer = pipLayers[surface];
-    layer.replaceChildren();
-    for (const position of positions[value]) {
-      const u = ((position - 1) % 3) / 2;
-      const v = Math.floor((position - 1) / 3) / 2;
-      let x, y, rx, ry, angle;
-      if (surface === 'front') {
-        x = 586 + 344*u - 41*v; y = 740 + 6*u + 285*v;
-        rx = 59; ry = 56; angle = -8;
-      } else if (surface === 'top') {
-        x = 506 + 439*u - 20*v; y = 274 + 28*u + 180*v;
-        rx = value === 6 ? 49 : 62; ry = value === 6 ? 33 : 58; angle = -10;
-      } else {
-        x = 262 + 92*u - 64*v; y = 430 + 107*u + 390*v;
-        rx = 34; ry = 63; angle = 20;
-      }
-      const pip = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
-      pip.setAttribute('cx',x);
-      pip.setAttribute('cy',y);
-      pip.setAttribute('rx',rx);
-      pip.setAttribute('ry',ry);
-      pip.setAttribute('transform',`rotate(${angle} ${x} ${y})`);
-      layer.append(pip);
-    }
-  }
+  const pips = document.getElementById('front-pips');
   function showValue(value) {
-    const [top,side] = adjacentFaces[value];
-    drawPips('front',value);
-    drawPips('top',top);
-    drawPips('side',side);
+    pips.replaceChildren();
+    for (const position of positions[value]) {
+      const pip = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pip.setAttribute('cx',66 + ((position - 1) % 3)*54);
+      pip.setAttribute('cy',65 + Math.floor((position - 1)/3)*54);
+      pip.setAttribute('r',15);
+      pips.append(pip);
+    }
     art.setAttribute('data-value',String(value));
-    die.setAttribute('aria-label', `Roll the die. Front face showing ${value}.`);
+    die.setAttribute('aria-label', `Roll the die. Showing ${value}.`);
   }
 
   // Rejection sampling gives all six sides equal probability.
@@ -78,6 +50,7 @@
     die.classList.add('rolling');
     message.classList.remove('is-five', 'is-out');
     message.textContent = '';
+    rollResult.textContent = '';
     instruction.textContent = '';
     announcement.textContent = 'Rolling';
     let preview;
@@ -91,6 +64,7 @@
     window.setTimeout(() => {
       clearInterval(preview);
       showValue(value);
+      rollResult.textContent = `Rolled ${value}`;
       die.classList.remove('rolling');
       stage.classList.remove('rolling');
       const wasInFive = fiveStreak > 0;
