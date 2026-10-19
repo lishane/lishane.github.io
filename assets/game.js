@@ -27,6 +27,7 @@
       pips.append(pip);
     }
     art.setAttribute('data-value',String(value));
+    window.rollFiveDie?.show(value);
     die.setAttribute('aria-label', `Roll the die. Showing ${value}.`);
   }
 
@@ -46,6 +47,7 @@
     stage.classList.remove('drink', 'everyone');
     result.classList.remove('drink', 'everyone');
     const value = randomFace();
+    window.rollFiveDie?.roll(value, reducedMotion.matches ? 100 : 1200);
     stage.classList.add('rolling');
     die.classList.add('rolling');
     message.classList.remove('is-five', 'is-out');
@@ -57,7 +59,7 @@
     if (!reducedMotion.matches) {
       let frame = 0;
       preview = window.setInterval(() => {
-        showValue(frame++ % 6 + 1);
+        if (!window.rollFiveDie) showValue(frame++ % 6 + 1);
         die.setAttribute('aria-label','Rolling the die');
       },90);
     }

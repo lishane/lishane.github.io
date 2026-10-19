@@ -1,0 +1,13 @@
+{
+  "name": "roll-five",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/die-3d.mjs --bundle --minify --format=iife --legal-comments=linked --outfile=assets/die-3d.js",
+    "test": "node tests/game.test.cjs && node tests/die-model.test.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.11",
+    "three": "0.180.0"
+  }
+}
