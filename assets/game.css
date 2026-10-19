@@ -62,7 +62,10 @@ main {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: transform .18s ease;
+  position: relative;
 }
+.die-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.has-3d .die-art { visibility: hidden; }
 .die-art {
   display: block;
   width: 220px;

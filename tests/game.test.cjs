@@ -40,7 +40,7 @@ function setup(reduced) {
     timers.delete(id); task.fn();
   };
   return {
-    node:id=>nodes.get(id), samples, timers, finish,
+    node:id=>nodes.get(id), samples, timers, finish, window,
     roll(value) { samples.push(value-1); nodes.get('dice-display').events.click(); finish(); }
   };
 }
@@ -50,6 +50,8 @@ for (const reduced of [false,true]) {
     assert.equal(n('front-pips').children.length,6);
     assert.equal(n('roll-result').textContent,'');
     assert(!n('result').classes.has('drink'), 'initial face is not a rolled five');
+    const calls = [];
+    game.window.rollFiveDie = {show: v => calls.push(['show',v]), roll: (v,duration) => calls.push(['roll',v,duration])};
     game.samples.push(value-1);
     n('dice-display').events.click();
     assert(n('dice-display').disabled);
@@ -58,6 +60,7 @@ for (const reduced of [false,true]) {
     assert.equal(n('roll-result').textContent,'');
     n('dice-display').events.click(); // repeated taps must not queue another result
     game.finish();
+    assert.deepEqual(calls,[['roll',value,reduced?100:1200],['show',value]], 'one toss and matching final 3D result');
     assert.equal(n('front-pips').children.length,value);
     assert.equal(n('die-art').attrs['data-value'],String(value));
     assert.equal(n('roll-result').textContent,`Rolled ${value}`);
